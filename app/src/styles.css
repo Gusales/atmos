@@ -8,4 +8,9 @@
   --color-accent: #87ebcd;
   --color-muted: #c2bff4;
   --color-subtle: #dad8f7;
+
+  --color-warning: #f6c833;
+  --color-alert: #f5923e;
+  --color-danger: #f2495c;
+  --color-critical: #a23c5c;
 }
