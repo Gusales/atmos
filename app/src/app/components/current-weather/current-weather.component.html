@@ -1,0 +1,47 @@
+<section
+    class="min-[1200px]:row-[1/3] relative grid grid-rows-[max-content_1fr_max-content] gap-10 p-3.5 rounded-[10px] backdrop-blur-[10px] bg-primary bg-[url('/assets/images/bg-temp-now.jpeg')] bg-cover"
+  >
+    <div
+      class="absolute -top-14 -left-14 h-44 w-44 bg-[url('/assets/svg/clouds.svg')] bg-no-repeat"
+    ></div>
+
+    <div class="flex justify-end gap-1 m-5">
+      <img src="/assets/svg/location-crosshairs.svg" alt="Icone que indica a localização" />
+      <p class="font-bold text-muted text-[14px]">São Paulo, SP</p>
+    </div>
+
+    <div class="text-center font-bold flex justify-center gap-1">
+      <div class="text-[88px] flex flex-col gap-1">
+        18
+        <div class="text-[20px]">
+          22°
+          <span class="text-muted"> 16° </span>
+        </div>
+      </div>
+      <div class="text-[24px] text-subtle mt-3.75">°C</div>
+    </div>
+
+    <div class="grid grid-flow-col gap-2">
+      <div class="flex items-center py-3 px-4 gap-3 bg-primary/60 rounded-md">
+        <img src="/assets/svg/wind.svg" alt="Icone de vento" />
+        <div>
+          <h3 class="font-normal text-[12px] leading-3.5 text-secondary">Vento</h3>
+          <h2 class="font-bold text-[18px] text-secondary">17 <span class="text-[14px] text-subtle">km/h</span></h2>
+        </div>
+      </div>
+      <div class="flex items-center py-3 px-4 gap-3 bg-primary/60 rounded-md">
+        <img src="/assets/svg/humidity.svg" alt="Icone de umidade" />
+        <div>
+          <h3 class="font-normal text-[12px] leading-3.5 text-secondary">Umidade</h3>
+          <h2 class="font-bold text-[18px] text-secondary">31 <span class="text-[14px] text-subtle">%</span></h2>
+        </div>
+      </div>
+      <div class="flex items-center py-3 px-4 gap-3 bg-primary/60 rounded-md">
+        <img src="/assets/svg/rain.svg" alt="Icone de chuva" />
+        <div>
+          <h3 class="font-normal text-[12px] leading-3.5 text-secondary">Chuva</h3>
+          <h2 class="font-bold text-[18px] text-secondary">10 <span class="text-[14px] text-subtle">%</span></h2>
+        </div>
+      </div>
+    </div>
+  </section>
