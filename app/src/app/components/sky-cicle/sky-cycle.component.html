@@ -1,0 +1,34 @@
+<section class="rounded-[10px] backdrop-blur-[10px] bg-primary p-2">
+    <div class="flex items-center justify-center gap-2 mt-4">
+        <img [src]="theme.iconSrc" alt="Ícone" />
+        <h2 class="text-[16px] text-subtle">{{ theme.title }}</h2>
+    </div>
+    <div class="mt-10 h-27.5">
+        <div
+        [class]="'relative mx-auto w-54 h-54 before:content-[\'\'] before:block before:absolute before:top-1/2 before:left-1/2 before:-m-1.5 before:transform-[rotate(calc((((100-var(--progress))/-100)*180)*1deg))_translate(106px)] before:h-3 before:w-3 before:rounded-full ' + theme.indicatorColorClass"
+        [style.--progress]="progressPercent"
+        [style.--glow-color]="theme.glowColor"
+        >
+        <div class="w-54 h-27 overflow-hidden relative">
+            <!-- Janela que revela a cúpula do nascer até a posição atual -->
+            <div
+                class="absolute top-0 left-1/2 -translate-x-[106px] h-26.5 overflow-hidden"
+                [style.width.px]="filledWidth"
+            >
+                <div
+                    class="absolute top-0 left-0 rounded-full [background:linear-gradient(180deg,rgba(var(--glow-color),0.25)_0%,rgba(var(--glow-color),0)_60%)]"
+                    [style.width.px]="domeDiameter"
+                    [style.height.px]="domeDiameter"
+                ></div>
+            </div>
+
+            <img class="absolute top-0" [src]="theme.chart" alt="Gráfico indicando o tempo" />
+        </div>
+        <time class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 font-bold text-[14px]">{{ formattedCurrentTime }}</time>
+        </div>
+    </div>
+    <div class="flex items-center justify-between max-w-69 mx-auto mt-2.5 mb-4 px-4">
+        <time class="text-[14px]">{{ startTime }}</time>
+        <time class="text-[14px]">{{ endTime }}</time>
+    </div>
+</section>
