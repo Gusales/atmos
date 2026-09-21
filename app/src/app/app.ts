@@ -1,13 +1,10 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { AirQualityComponent } from './components/air-quality';
-import { CurrentWeatherComponent } from './components/current-weather';
-import { SkyCycleComponent } from './components/sky-cicle';
-import { WeaklyForecastComponent } from './components/weakly-forecast';
+import { WeatherDashboardComponent } from './features/weather-dashboard';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, CurrentWeatherComponent, AirQualityComponent, SkyCycleComponent, WeaklyForecastComponent],
+  imports: [RouterOutlet, WeatherDashboardComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
