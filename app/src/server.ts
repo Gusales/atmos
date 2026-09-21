@@ -6,11 +6,20 @@ import {
 } from '@angular/ssr/node';
 import express from 'express';
 import { join } from 'node:path';
+import { weatherRoutes } from './app/server/routes';
+
+try {
+  process.loadEnvFile();
+} catch {
+  // Sem .env disponível (ex: produção usando variáveis de ambiente reais) — ok ignorar.
+}
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();
 const angularApp = new AngularNodeAppEngine();
+
+app.use('/api', weatherRoutes)
 
 /**
  * Example Express Rest API endpoints can be defined here.
