@@ -1,6 +1,7 @@
 import { Component, computed, inject, OnInit, signal } from "@angular/core";
 
 import { DayDto, WeatherResponseDto } from "@/app/core/dtos/weather";
+import { GeoLocationService, IUserLocation } from "@/app/core/services/geolocation";
 import { WeatherService } from "@/app/core/services/weather";
 import { firstValueFrom } from "rxjs";
 import { AirQualityComponent } from "../../components/air-quality";
@@ -57,7 +58,12 @@ function weekdayName(dayOffset: number): string {
 })
 export class WeatherDashboardComponent implements OnInit {
     protected readonly weatherService = inject(WeatherService)
+    protected readonly geoLocationService = inject(GeoLocationService)
     protected readonly weather = signal<WeatherResponseDto | null>(null)
+    private readonly defaultLocations: IUserLocation = {
+        latitude: -23.5505,
+        longitude: -46.6333
+    }
 
     protected readonly today = computed(() => this.weather()?.days[0] ?? null)
 
@@ -99,7 +105,16 @@ export class WeatherDashboardComponent implements OnInit {
     }
 
     protected async getCurrentLocation() {
-        const data = await firstValueFrom(this.weatherService.getWeatherByLocation(-23.5505, -46.6333))
+        let data: WeatherResponseDto;
+
+        try {
+            const { latitude, longitude } = await this.geoLocationService.getCoordinates()
+            data = await firstValueFrom(this.weatherService.getWeatherByLocation(latitude, longitude))
+            
+        } catch (error) {
+            data = await firstValueFrom(this.weatherService.getWeatherByLocation(this.defaultLocations.latitude, this.defaultLocations.longitude))
+        }
+        
 
         this.weather.set(data)
     }
