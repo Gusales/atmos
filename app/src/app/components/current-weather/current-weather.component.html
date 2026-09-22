@@ -1,9 +1,9 @@
 <section
-    class="h-full relative grid grid-rows-[max-content_1fr_max-content] gap-10 p-3.5 rounded-[10px] backdrop-blur-[10px] bg-primary bg-[url('/assets/images/bg-temp-now.jpeg')] bg-cover"
+    class="h-full relative grid grid-rows-[max-content_1fr_max-content] gap-6 min-[1200px]:gap-10 p-3.5 rounded-[10px] backdrop-blur-[10px] bg-primary bg-[url('/assets/images/bg-temp-now.jpeg')] bg-cover"
   >
     <app-weather-icon
       [name]="currentWeather"
-      class="absolute -top-10 -left-10 h-44 w-44"
+      class="absolute top-0 left-0 h-32 w-32 min-[1200px]:-top-10 min-[1200px]:-left-10 min-[1200px]:h-44 min-[1200px]:w-44"
     />
 
     <div class="flex justify-end gap-1 m-5">
@@ -12,36 +12,36 @@
     </div>
 
     <div class="text-center font-bold flex justify-center gap-1">
-      <div class="text-[88px] flex flex-col gap-1">
+      <div class="text-[56px] min-[1200px]:text-[88px] flex flex-col gap-1">
         {{ currentTemperature }}
-        <div class="text-[20px]">
+        <div class="text-[16px] min-[1200px]:text-[20px]">
           {{ maximunTemperature }}°
           <span class="text-muted"> {{ minimumTemperature }}° </span>
         </div>
       </div>
-      <div class="text-[24px] text-subtle mt-3.75">°C</div>
+      <div class="text-[16px] min-[1200px]:text-[24px] text-subtle mt-2 min-[1200px]:mt-3.75">°C</div>
     </div>
 
-    <div class="grid grid-flow-col gap-2">
-      <div class="flex items-center py-3 px-4 gap-3 bg-primary/60 rounded-md">
+    <div class="grid grid-cols-3 gap-2">
+      <div class="flex items-center py-2 px-2 min-[1200px]:py-3 min-[1200px]:px-4 gap-2 min-[1200px]:gap-3 bg-primary/60 rounded-md">
         <img src="/assets/svg/wind.svg" alt="Icone de vento" />
         <div>
           <h3 class="font-normal text-[12px] leading-3.5 text-secondary">Vento</h3>
-          <h2 class="font-bold text-[18px] text-secondary">{{ windSpeed }} <span class="text-[14px] text-subtle">km/h</span></h2>
+          <h2 class="font-bold text-[14px] min-[1200px]:text-[18px] text-secondary">{{ windSpeed }} <span class="text-[14px] text-subtle">km/h</span></h2>
         </div>
       </div>
-      <div class="flex items-center py-3 px-4 gap-3 bg-primary/60 rounded-md">
+      <div class="flex items-center py-2 px-2 min-[1200px]:py-3 min-[1200px]:px-4 gap-2 min-[1200px]:gap-3 bg-primary/60 rounded-md">
         <img src="/assets/svg/humidity.svg" alt="Icone de umidade" />
         <div>
           <h3 class="font-normal text-[12px] leading-3.5 text-secondary">Umidade</h3>
-          <h2 class="font-bold text-[18px] text-secondary">{{ humidity }} <span class="text-[14px] text-subtle">%</span></h2>
+          <h2 class="font-bold text-[14px] min-[1200px]:text-[18px] text-secondary">{{ humidity }} <span class="text-[14px] text-subtle">%</span></h2>
         </div>
       </div>
-      <div class="flex items-center py-3 px-4 gap-3 bg-primary/60 rounded-md">
+      <div class="flex items-center py-2 px-2 min-[1200px]:py-3 min-[1200px]:px-4 gap-2 min-[1200px]:gap-3 bg-primary/60 rounded-md">
         <img src="/assets/svg/rain.svg" alt="Icone de chuva" />
         <div>
           <h3 class="font-normal text-[12px] leading-3.5 text-secondary">Chuva</h3>
-          <h2 class="font-bold text-[18px] text-secondary">{{ rainProbabilityPercent }} <span class="text-[14px] text-subtle">%</span></h2>
+          <h2 class="font-bold text-[14px] min-[1200px]:text-[18px] text-secondary">{{ rainProbabilityPercent }} <span class="text-[14px] text-subtle">%</span></h2>
         </div>
       </div>
     </div>

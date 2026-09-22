@@ -1,4 +1,4 @@
-<section class="grid text-center max-h-69.25 gap-8 p-4 rounded-[10px] backdrop-blur-[10px] bg-primary">
+<section class="grid text-center max-h-69.25 gap-4 min-[1200px]:gap-8 p-4 rounded-[10px] backdrop-blur-[10px] bg-primary">
     <div class="flex items-center justify-center gap-2">
       <img src="/assets/svg/leaf.svg" alt="Icone de uma folha" />
       <h2 class="text-[16px] text-subtle">Qualidade do ar</h2>
@@ -7,7 +7,7 @@
       <h3 class="font-bold text-[18px]" [class]="airQualityColorClass">{{ airQualityQualification }}</h3>
       <h2 class="mt-1 text-[40px] text-secondary">{{ airQualityIndex }}</h2>
     </div>
-    <div class="grid grid-flow-col gap-4">
+    <div class="grid grid-cols-5 gap-1 min-[1200px]:gap-4">
       <div class="grid gap-0.5">
         <p class="font-bold text-[14px]" [class]="pollutantColorClass('pm10')">{{ pm10 }}</p>
         <p class="text-[12px] uppercase text-secondary">PM10</p>
