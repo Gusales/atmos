@@ -1,6 +1,6 @@
 import { Component, computed, inject, OnInit, signal } from "@angular/core";
 
-import { DayDto, WeatherResponseDto } from "@/app/core/dtos/weather";
+import { CurrentConditionsDto, DayDto, WeatherResponseDto } from "@/app/core/dtos/weather";
 import { GeoLocationService, IUserLocation } from "@/app/core/services/geolocation";
 import { WeatherService } from "@/app/core/services/weather";
 import { firstValueFrom } from "rxjs";
@@ -29,15 +29,22 @@ function parseTimeToMinutes(time: string): number {
     return hours * 60 + minutes
 }
 
+interface WeatherConditionReading {
+    precipprob: number
+    humidity: number
+}
+
 /**
  * A API não retorna um campo de condição já pronto (icone/descrição),
- * então o ícone é aproximado a partir de precipitação/umidade do dia.
+ * então o ícone é aproximado a partir de precipitação/umidade — pode
+ * ser aplicado tanto a um dia inteiro (DayDto) quanto à leitura atual
+ * (CurrentConditionsDto), já que ambos têm esses dois campos.
  */
-function resolveWeatherCondition(day: DayDto): WeatherNamesEnum {
-    if (day.precipprob >= 70) return WeatherNamesEnum.THUNDER
-    if (day.precipprob >= 40) return WeatherNamesEnum.RAIN
-    if (day.precipprob >= 15) return WeatherNamesEnum.PARTLY_CLOUDY
-    if (day.humidity >= 80) return WeatherNamesEnum.CLOUDY
+function resolveWeatherCondition(reading: WeatherConditionReading): WeatherNamesEnum {
+    if (reading.precipprob >= 70) return WeatherNamesEnum.THUNDER
+    if (reading.precipprob >= 40) return WeatherNamesEnum.RAIN
+    if (reading.precipprob >= 15) return WeatherNamesEnum.PARTLY_CLOUDY
+    if (reading.humidity >= 80) return WeatherNamesEnum.CLOUDY
 
     return WeatherNamesEnum.SUN
 }
@@ -119,7 +126,7 @@ export class WeatherDashboardComponent implements OnInit {
         this.weather.set(data)
     }
 
-    protected resolveTodayWeatherCondition(day: DayDto): WeatherNamesEnum {
-        return resolveWeatherCondition(day)
+    protected resolveCurrentWeatherCondition(currentConditions: CurrentConditionsDto): WeatherNamesEnum {
+        return resolveWeatherCondition(currentConditions)
     }
 }

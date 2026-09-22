@@ -5,7 +5,7 @@
   >
     <app-current-weather
       class="min-[1200px]:row-[1/3]"
-      [currentWeather]="resolveTodayWeatherCondition(today()!)"
+      [currentWeather]="resolveCurrentWeatherCondition(data.currentConditions)"
       [currentTemperature]="data.currentConditions.temp"
       [minimumTemperature]="today()!.tempmin"
       [maximunTemperature]="today()!.tempmax"
