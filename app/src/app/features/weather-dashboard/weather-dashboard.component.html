@@ -1,12 +1,32 @@
-<main
-  id="app"
-  class="min-h-screen text-white font-['Lato',sans-serif] bg-[url('/assets/images/bg.jpg')] bg-cover bg-center bg-no-repeat grid place-content-center gap-6 p-16 min-[1200px]:grid-cols-[480px_277px_277px] min-[1200px]:grid-rows-[244px_212px]"
->
-  <app-current-weather></app-current-weather>
+@if (weather(); as data) {
+  <main
+    id="app"
+    class="min-h-screen text-white font-['Lato',sans-serif] bg-[url('/assets/images/bg.jpg')] bg-cover bg-center bg-no-repeat grid place-content-center gap-6 p-16 min-[1200px]:grid-cols-[480px_277px_277px] min-[1200px]:grid-rows-[244px_212px]"
+  >
+    <app-current-weather
+      [currentWeather]="resolveTodayWeatherCondition(today()!)"
+      [currentTemperature]="data.currentConditions.temp"
+      [minimumTemperature]="today()!.tempmin"
+      [maximunTemperature]="today()!.tempmax"
+      [windSpeed]="data.currentConditions.windspeed"
+      [humidity]="data.currentConditions.humidity"
+      [rainProbabilityPercent]="data.currentConditions.precipprob"
+      [location]="data.resolvedAddress"
+    ></app-current-weather>
 
-  <app-air-quality></app-air-quality>
+    <app-air-quality
+      [pm10]="data.currentConditions.pm10 ?? 0"
+      [so2]="data.currentConditions.so2 ?? 0"
+      [no2]="data.currentConditions.no2 ?? 0"
+      [o3]="data.currentConditions.o3 ?? 0"
+      [co]="data.currentConditions.co ?? 0"
+    ></app-air-quality>
 
-  <app-sky-cycle></app-sky-cycle>
+    <app-sky-cycle
+      [startTime]="skyCycleTimes().startTime"
+      [endTime]="skyCycleTimes().endTime"
+    ></app-sky-cycle>
 
-  <app-weakly-forecast></app-weakly-forecast>
-</main>
+    <app-weakly-forecast [weatherDays]="weekForecast()"></app-weakly-forecast>
+  </main>
+}
