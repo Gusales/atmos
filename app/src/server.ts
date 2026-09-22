@@ -1,3 +1,5 @@
+import './app/server/env';
+
 import {
   AngularNodeAppEngine,
   createNodeRequestHandler,
@@ -7,12 +9,6 @@ import {
 import express from 'express';
 import { join } from 'node:path';
 import { weatherRoutes } from './app/server/routes';
-
-try {
-  process.loadEnvFile();
-} catch {
-  // Sem .env disponível (ex: produção usando variáveis de ambiente reais) — ok ignorar.
-}
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
