@@ -4,6 +4,7 @@
     class="min-h-screen text-white font-['Lato',sans-serif] bg-[url('/assets/images/bg.jpg')] bg-cover bg-center bg-no-repeat grid place-content-center gap-6 p-16 min-[1200px]:grid-cols-[480px_277px_277px] min-[1200px]:grid-rows-[244px_212px]"
   >
     <app-current-weather
+      class="min-[1200px]:row-[1/3]"
       [currentWeather]="resolveTodayWeatherCondition(today()!)"
       [currentTemperature]="data.currentConditions.temp"
       [minimumTemperature]="today()!.tempmin"
@@ -27,6 +28,6 @@
       [endTime]="skyCycleTimes().endTime"
     ></app-sky-cycle>
 
-    <app-weakly-forecast [weatherDays]="weekForecast()"></app-weakly-forecast>
+    <app-weakly-forecast class="min-[1200px]:col-[2/4]" [weatherDays]="weekForecast()"></app-weakly-forecast>
   </main>
 }
