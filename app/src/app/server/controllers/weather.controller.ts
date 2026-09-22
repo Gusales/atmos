@@ -74,7 +74,7 @@ export class WeatherController {
         weatherApi.searchParams.set('lang', 'pt');
         weatherApi.searchParams.set('unitGroup', 'metric');
         weatherApi.searchParams.set('key', this.weatherApiKey);
-        weatherApi.searchParams.set('elements', 'add:add:pm10,so2,no2,o3,co,temp,tempmax,tempmin,windspeed,humidity,precipprob,sunrise,sunset');
+        weatherApi.searchParams.set('elements', 'add:pm10,so2,no2,o3,co,temp,tempmax,tempmin,windspeed,humidity,precipprob,sunrise,sunset');
 
         return weatherApi;
     }

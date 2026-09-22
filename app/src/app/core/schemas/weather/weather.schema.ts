@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 const pollutantSchema = z.object({
+    pm10: z.number().nullable(),
     so2: z.number().nullable(),
     no2: z.number().nullable(),
     o3: z.number().nullable(),

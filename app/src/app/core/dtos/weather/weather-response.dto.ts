@@ -5,6 +5,7 @@ export class HourDto {
     @Expose() humidity: number = 0
     @Expose() precipprob: number = 0
     @Expose() windspeed: number = 0
+    @Expose() pm10: number | null = null
     @Expose() so2: number | null = null
     @Expose() no2: number | null = null
     @Expose() o3: number | null = null
@@ -24,6 +25,7 @@ export class DayDto {
     @Expose() windspeed: number = 0
     @Expose() sunrise: string = ''
     @Expose() sunset: string = ''
+    @Expose() pm10: number | null = null
     @Expose() so2: number | null = null
     @Expose() no2: number | null = null
     @Expose() o3: number | null = null
@@ -60,6 +62,7 @@ export class CurrentConditionsDto {
     @Expose() humidity: number = 0
     @Expose() precipprob: number = 0
     @Expose() windspeed: number = 0
+    @Expose() pm10: number | null = null
     @Expose() so2: number | null = null
     @Expose() no2: number | null = null
     @Expose() o3: number | null = null
