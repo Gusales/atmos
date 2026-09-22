@@ -6,6 +6,6 @@ const controller = new WeatherController()
 
 const prefix = '/weather'
 
-router.get(prefix, controller.getCurrentWeather)
+router.get(prefix, (request, response) => controller.getWeather(request, response))
 
 export const weatherRoutes = router;

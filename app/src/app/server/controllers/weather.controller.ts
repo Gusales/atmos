@@ -1,10 +1,5 @@
 import type { Request as ExpressRequest, Response as ExpressResponse } from 'express';
-import { HttpError, InvalidCoordinatesError, UpstreamWeatherApiError } from '../errors';
-
-interface Coordinates {
-    latitude: number
-    longitude: number
-}
+import { HttpError, UpstreamWeatherApiError } from '../errors';
 
 export class WeatherController {
     private readonly weatherApiUrl: string
@@ -17,10 +12,10 @@ export class WeatherController {
         this.weatherApiKey = process.env['WEATHER_API_KEY'] || weatherApiKey || ''
     }
 
-    public getCurrentWeather = async (req: ExpressRequest, res: ExpressResponse): Promise<void> => {
+    public async getWeather (req: ExpressRequest, res: ExpressResponse): Promise<void> {
         try {
-            const coordinates = this.parseCoordinates(req)
-            const weatherApi = this.buildWeatherApiUrl(coordinates)
+            const search = req.query['search'] as string
+            const weatherApi = this.buildWeatherApiUrl(search)
 
             const request = await fetch(weatherApi, {
                 headers: this.getDefaultHeaders()
@@ -38,23 +33,8 @@ export class WeatherController {
         }
     }
 
-    private parseCoordinates(req: ExpressRequest): Coordinates {
-        const latitude = Number(req.headers['latitude'])
-        const longitude = Number(req.headers['longitude'])
-
-        const isValid =
-            !Number.isNaN(latitude) && latitude >= -90 && latitude <= 90 &&
-            !Number.isNaN(longitude) && longitude >= -180 && longitude <= 180
-
-        if (!isValid) {
-            throw new InvalidCoordinatesError()
-        }
-
-        return { latitude, longitude }
-    }
-
-    private buildWeatherApiUrl({ latitude, longitude }: Coordinates): URL {
-        const weatherApi = new URL(`${this.weatherApiUrl}/${latitude},${longitude}`)
+    private buildWeatherApiUrl(search: string): URL {
+        const weatherApi = new URL(`${this.weatherApiUrl}/${search}`)
         return this.setDefaultQueryParams(weatherApi)
     }
 
