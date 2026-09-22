@@ -7,32 +7,36 @@ import { BrazilianAqiCalculator } from "../../shared/utils/brazilian-aqi-calcula
     standalone: true
 })
 export class AirQualityComponent {
-    @Input() protected readonly pm10: number = 0;
-    @Input() protected readonly so2: number = 0;
-    @Input() protected readonly no2: number = 0;
-    @Input() protected readonly o3: number = 0;
-    @Input() protected readonly co: number = 0;
+    @Input() pm10: number = 0;
+    @Input() so2: number = 0;
+    @Input() no2: number = 0;
+    @Input() o3: number = 0;
+    @Input() co: number = 0;
 
-    protected airQualityIndex: number;
-    protected airQualityQualification: string;
-    protected airQualityCriticalPollutant: string | null;
-    protected airQualitySubIndices: Record<"pm10" | "so2" | "no2" | "o3" | "co", number | null>;
-
-    constructor() {
-        const airQualityBrasilianFormatResult = BrazilianAqiCalculator.calculate({
+    private get airQualityResult() {
+        return BrazilianAqiCalculator.calculate({
             co: this.co,
             no2: this.no2,
             o3: this.o3,
             pm10: this.pm10,
             so2: this.so2
         })
+    }
 
-        const { index, criticalPollutant, name, subIndices } = airQualityBrasilianFormatResult
+    protected get airQualityIndex(): number {
+        return this.airQualityResult.index ?? 0
+    }
 
-        this.airQualityIndex = index ?? 0;
-        this.airQualityQualification = name;
-        this.airQualityCriticalPollutant = criticalPollutant;
-        this.airQualitySubIndices = subIndices;
+    protected get airQualityQualification(): string {
+        return this.airQualityResult.name
+    }
+
+    protected get airQualityCriticalPollutant(): string | null {
+        return this.airQualityResult.criticalPollutant
+    }
+
+    protected get airQualitySubIndices(): Record<"pm10" | "so2" | "no2" | "o3" | "co", number | null> {
+        return this.airQualityResult.subIndices
     }
 
     protected get airQualityColorClass(): string {
