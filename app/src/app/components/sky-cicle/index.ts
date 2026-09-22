@@ -33,9 +33,9 @@ const DOME_RADIUS = 106;
   standalone: true
 })
 export class SkyCycleComponent {
-  @Input() protected readonly startTime: string = "18:00";
-  @Input() protected readonly endTime: string = "06:00";
-  @Input() protected readonly currentTime: Date = new Date();
+  @Input() startTime: string = "18:00";
+  @Input() endTime: string = "06:00";
+  @Input() currentTime: Date = new Date();
 
   protected readonly domeDiameter = DOME_RADIUS * 2;
 
@@ -94,5 +94,13 @@ export class SkyCycleComponent {
     const hours = this.currentTime.getHours().toString().padStart(2, "0");
     const minutes = this.currentTime.getMinutes().toString().padStart(2, "0");
     return `${hours}:${minutes}`;
+  }
+
+  protected get formattedStartTime(): string {
+    return this.startTime.slice(0, 5);
+  }
+
+  protected get formattedEndTime(): string {
+    return this.endTime.slice(0, 5);
   }
 }
