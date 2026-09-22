@@ -11,7 +11,7 @@ import { WeatherNamesEnum } from "../../shared/enums";
 export class CurrentWeatherComponent {
     @Input() currentWeather: WeatherNamesEnum = WeatherNamesEnum.SUN
 
-    @Input() city: string = "São Paulo, SP"
+    @Input() location: string = "São Paulo, SP"
     @Input() currentTemperature: number = 0
     @Input() minimumTemperature: number = 0
     @Input() maximunTemperature: number = 0

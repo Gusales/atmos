@@ -3,12 +3,12 @@
   >
     <app-weather-icon
       [name]="currentWeather"
-      class="absolute -top-14 -left-14 h-44 w-44"
+      class="absolute -top-10 -left-10 h-44 w-44"
     />
 
     <div class="flex justify-end gap-1 m-5">
       <img src="/assets/svg/location-crosshairs.svg" alt="Icone que indica a localização" />
-      <p class="font-bold text-muted text-[14px]">São Paulo, SP</p>
+      <p class="font-bold text-muted text-[14px]">{{ location }}</p>
     </div>
 
     <div class="text-center font-bold flex justify-center gap-1">
