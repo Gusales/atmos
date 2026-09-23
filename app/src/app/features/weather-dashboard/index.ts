@@ -1,4 +1,5 @@
-import { Component, computed, inject, OnInit, signal } from "@angular/core";
+import { Component, computed, DestroyRef, inject, OnInit, signal } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 
 import { GeocodingLocationDto } from "@/app/core/dtos/geocoding";
 import { CurrentConditionsDto, WeatherResponseDto } from "@/app/core/dtos/weather";
@@ -6,7 +7,7 @@ import { FavoritePlace, FavoritesService } from "@/app/core/services/favorites";
 import { GeoCodingService } from "@/app/core/services/geocoding";
 import { GeoLocationService, IUserLocation } from "@/app/core/services/geolocation";
 import { WeatherService } from "@/app/core/services/weather";
-import { firstValueFrom } from "rxjs";
+import { firstValueFrom, interval } from "rxjs";
 import { AirQualityComponent } from "../../components/air-quality";
 import { CurrentWeatherComponent } from "../../components/current-weather";
 import { FavoritesModalComponent } from "../../components/favorites-modal";
@@ -17,6 +18,7 @@ import { WeatherNamesEnum } from "../../shared/enums";
 import { Place } from "../../shared/types";
 
 const WEEKDAY_FORMATTER = new Intl.DateTimeFormat('pt-BR', { weekday: 'long' })
+export const WEATHER_POLL_INTERVAL_MS = 5 * 60 * 1000
 
 interface IWeekForecastDay {
     name: string
@@ -170,8 +172,32 @@ export class WeatherDashboardComponent implements OnInit {
             : { startTime: day.sunset, endTime: day.sunrise }
     })
 
+    constructor() {
+        const destroyRef = inject(DestroyRef)
+
+        interval(WEATHER_POLL_INTERVAL_MS).pipe(
+            takeUntilDestroyed(destroyRef)
+        ).subscribe(() => this.refreshCurrentWeather())
+    }
+
     ngOnInit(): void {
         this.getCurrentLocation()
+    }
+
+    /**
+     * Reconsulta o clima do local atual sem repetir a geolocalização/geocoding
+     * — só troca os dados do `weather`, preservando o endereço já resolvido.
+     */
+    protected async refreshCurrentWeather(): Promise<void> {
+        const current = this.currentPlace()
+        if (!current) return
+
+        const data = await firstValueFrom(
+            this.weatherService.getWeatherByLocation(current.latitude, current.longitude)
+        )
+
+        data.resolvedAddress = this.weather()?.resolvedAddress ?? data.resolvedAddress
+        this.weather.set(data)
     }
 
     protected async getCurrentLocation() {

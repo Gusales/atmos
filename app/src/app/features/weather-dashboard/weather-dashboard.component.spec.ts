@@ -1,12 +1,12 @@
-import { TestBed } from '@angular/core/testing';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { GeocodingLocationMock } from '@/app/core/dtos/geocoding';
 import { WeatherResponseMock } from '@/app/core/dtos/weather';
 import { FavoritesService } from '@/app/core/services/favorites';
 import { GeoCodingService } from '@/app/core/services/geocoding';
 import { GeoLocationService } from '@/app/core/services/geolocation';
 import { WeatherService } from '@/app/core/services/weather';
+import { TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { WeatherDashboardComponent } from './index';
 
 describe('WeatherDashboardComponent (integration)', () => {
@@ -201,5 +201,64 @@ describe('WeatherDashboardComponent (integration)', () => {
         vi.spyOn(geocodingService, 'getPlaceByCoordinates').mockReturnValue(of(new GeocodingLocationMock().entity()));
 
         await expect(component['getCurrentLocation']()).rejects.toThrow('network error');
+    });
+
+    describe('weather polling', () => {
+        beforeEach(() => {
+            fixture.destroy();
+            vi.useFakeTimers();
+            fixture = TestBed.createComponent(WeatherDashboardComponent);
+            component = fixture.componentInstance;
+
+            vi.spyOn(geoLocationService, 'getCoordinates').mockReturnValue(new Promise(() => {}));
+        });
+
+        afterEach(() => {
+            fixture.destroy();
+            vi.useRealTimers();
+        });
+
+        it('refetches the weather for the current place every 5 minutes, preserving the resolved address', async () => {
+            component['currentPlace'].set({
+                id: 'current',
+                name: 'São Paulo',
+                state: 'SP',
+                latitude: -23.5505,
+                longitude: -46.6333
+            });
+            component['weather'].set(new WeatherResponseMock().entity({ resolvedAddress: 'São Paulo, SP' }));
+
+            const refreshedWeather = new WeatherResponseMock().entity({ resolvedAddress: 'stale value from upstream' });
+            const getWeatherByLocation = vi.spyOn(weatherService, 'getWeatherByLocation').mockReturnValue(of(refreshedWeather));
+
+            await vi.advanceTimersByTimeAsync(5 * 60 * 1000);
+
+            expect(getWeatherByLocation).toHaveBeenCalledWith(-23.5505, -46.6333);
+            expect(component['weather']()?.resolvedAddress).toBe('São Paulo, SP');
+        });
+
+        it('does not poll before 5 minutes have elapsed', async () => {
+            component['currentPlace'].set({
+                id: 'current',
+                name: 'São Paulo',
+                state: 'SP',
+                latitude: -23.5505,
+                longitude: -46.6333
+            });
+
+            const getWeatherByLocation = vi.spyOn(weatherService, 'getWeatherByLocation').mockReturnValue(of(new WeatherResponseMock().entity()));
+
+            await vi.advanceTimersByTimeAsync(5 * 60 * 1000 - 1);
+
+            expect(getWeatherByLocation).not.toHaveBeenCalled();
+        });
+
+        it('does nothing when there is no current place yet', async () => {
+            const getWeatherByLocation = vi.spyOn(weatherService, 'getWeatherByLocation');
+
+            await vi.advanceTimersByTimeAsync(5 * 60 * 1000);
+
+            expect(getWeatherByLocation).not.toHaveBeenCalled();
+        });
     });
 });
