@@ -1,25 +1,29 @@
 import { Component, computed, inject, OnInit, signal } from "@angular/core";
 
-import { CurrentConditionsDto, DayDto, WeatherResponseDto } from "@/app/core/dtos/weather";
+import { GeocodingLocationDto } from "@/app/core/dtos/geocoding";
+import { CurrentConditionsDto, WeatherResponseDto } from "@/app/core/dtos/weather";
+import { GeoCodingService } from "@/app/core/services/geocoding";
 import { GeoLocationService, IUserLocation } from "@/app/core/services/geolocation";
 import { WeatherService } from "@/app/core/services/weather";
 import { firstValueFrom } from "rxjs";
 import { AirQualityComponent } from "../../components/air-quality";
 import { CurrentWeatherComponent } from "../../components/current-weather";
+import { PlaceSearchComponent } from "../../components/place-search";
 import { SkyCycleComponent } from "../../components/sky-cicle";
 import { WeaklyForecastComponent } from "../../components/weakly-forecast";
 import { WeatherNamesEnum } from "../../shared/enums";
+import { Place } from "../../shared/types";
 
 const WEEKDAY_FORMATTER = new Intl.DateTimeFormat('pt-BR', { weekday: 'long' })
 
-interface WeekForecastDay {
+interface IWeekForecastDay {
     name: string
     weather: WeatherNamesEnum
     minTemperature: number
     maxTemperature: number
 }
 
-interface SkyCycleTimes {
+interface ISkyCycleTimes {
     startTime: string
     endTime: string
 }
@@ -29,7 +33,7 @@ function parseTimeToMinutes(time: string): number {
     return hours * 60 + minutes
 }
 
-interface WeatherConditionReading {
+interface IWeatherConditionReading {
     precipprob: number
     humidity: number
 }
@@ -40,7 +44,7 @@ interface WeatherConditionReading {
  * ser aplicado tanto a um dia inteiro (DayDto) quanto à leitura atual
  * (CurrentConditionsDto), já que ambos têm esses dois campos.
  */
-function resolveWeatherCondition(reading: WeatherConditionReading): WeatherNamesEnum {
+function resolveWeatherCondition(reading: IWeatherConditionReading): WeatherNamesEnum {
     if (reading.precipprob >= 70) return WeatherNamesEnum.THUNDER
     if (reading.precipprob >= 40) return WeatherNamesEnum.RAIN
     if (reading.precipprob >= 15) return WeatherNamesEnum.PARTLY_CLOUDY
@@ -57,15 +61,52 @@ function weekdayName(dayOffset: number): string {
     return weekday.charAt(0).toUpperCase() + weekday.slice(1)
 }
 
+function toPlace(location: GeocodingLocationDto): Place {
+    return {
+        id: String(location.place_id),
+        name: location.name,
+        neighborhood: location.address.city_district ?? '',
+        city: location.address.city ?? location.name,
+        state: location.address.state ?? ''
+    }
+}
+
+/**
+ * Formata o local exibido de acordo com o nível geográfico retornado pela
+ * API de geocoding: bairro mostra cidade e UF, cidade mostra só a UF, e
+ * estado mostra "BR" no lugar da UF (não há uma UF "dele mesmo").
+ */
+function formatLocationAddress(location: GeocodingLocationDto): string {
+    const uf = location.address['ISO3166-2-lvl4']?.split('-')[1] ?? ''
+
+    switch (location.addresstype) {
+        case 'city_district':
+            return `${location.address.city_district ?? location.name}, ${location.address.city ?? ''}, ${uf}`
+        case 'city':
+            return `${location.address.city ?? location.name}, ${uf}`
+        case 'state':
+            return `${location.address.state ?? location.name}, BR`
+        default:
+            return location.name
+    }
+}
+
 @Component({
     selector: 'app-weather-dashboard',
     templateUrl: './weather-dashboard.component.html',
     standalone: true,
-    imports: [CurrentWeatherComponent, AirQualityComponent, SkyCycleComponent, WeaklyForecastComponent]
+    imports: [
+        CurrentWeatherComponent,
+        AirQualityComponent,
+        SkyCycleComponent,
+        WeaklyForecastComponent,
+        PlaceSearchComponent
+    ]
 })
 export class WeatherDashboardComponent implements OnInit {
     protected readonly weatherService = inject(WeatherService)
     protected readonly geoLocationService = inject(GeoLocationService)
+    protected readonly geocodingService = inject(GeoCodingService)
     protected readonly weather = signal<WeatherResponseDto | null>(null)
     private readonly defaultLocations: IUserLocation = {
         latitude: -23.5505,
@@ -74,7 +115,7 @@ export class WeatherDashboardComponent implements OnInit {
 
     protected readonly today = computed(() => this.weather()?.days[0] ?? null)
 
-    protected readonly weekForecast = computed<WeekForecastDay[]>(() => {
+    protected readonly weekForecast = computed<IWeekForecastDay[]>(() => {
         const days = this.weather()?.days ?? []
 
         return days.slice(1, 6).map((day, index) => ({
@@ -91,7 +132,7 @@ export class WeatherDashboardComponent implements OnInit {
      * estamos no período noturno: o ciclo exibido deve ir do pôr do sol de
      * hoje até o nascer do sol seguinte, não o contrário.
      */
-    protected readonly skyCycleTimes = computed<SkyCycleTimes>(() => {
+    protected readonly skyCycleTimes = computed<ISkyCycleTimes>(() => {
         const day = this.today()
         if (!day) return { startTime: '06:00', endTime: '18:00' }
 
@@ -116,17 +157,54 @@ export class WeatherDashboardComponent implements OnInit {
 
         try {
             const { latitude, longitude } = await this.geoLocationService.getCoordinates()
-            data = await firstValueFrom(this.weatherService.getWeatherByLocation(latitude, longitude))
-            
+            const [weatherResponse, geocodingResponse] = await Promise.all([
+                firstValueFrom(this.weatherService.getWeatherByLocation(latitude, longitude)),
+                firstValueFrom(this.geocodingService.getPlaceByCoordinates(latitude, longitude))
+            ])
+
+            data = weatherResponse
+            data.resolvedAddress = formatLocationAddress(geocodingResponse)
+
         } catch (error) {
             data = await firstValueFrom(this.weatherService.getWeatherByLocation(this.defaultLocations.latitude, this.defaultLocations.longitude))
+            data.resolvedAddress = "São Paulo, SP"
         }
-        
 
         this.weather.set(data)
     }
 
     protected resolveCurrentWeatherCondition(currentConditions: CurrentConditionsDto): WeatherNamesEnum {
         return resolveWeatherCondition(currentConditions)
+    }
+
+    protected places = signal<Place[]>([])
+    protected isSearching = signal(false)
+
+    /** Guarda os DTOs da última busca (com lat/lon) pra achar as coordenadas ao selecionar um lugar. */
+    private lastSearchResults = signal<GeocodingLocationDto[]>([])
+
+    protected async onSearch(query: string): Promise<void> {
+        this.isSearching.set(true)
+
+        try {
+            const results = await firstValueFrom(this.geocodingService.getPlaceBySearch(query))
+
+            this.lastSearchResults.set(results)
+            this.places.set(results.map(location => toPlace(location)))
+        } finally {
+            this.isSearching.set(false)
+        }
+    }
+
+    protected async onPlaceSelected(place: Place): Promise<void> {
+        const location = this.lastSearchResults().find(result => String(result.place_id) === place.id)
+        if (!location) return
+
+        const data = await firstValueFrom(
+            this.weatherService.getWeatherByLocation(Number(location.lat), Number(location.lon))
+        )
+
+        data.resolvedAddress = formatLocationAddress(location)
+        this.weather.set(data)
     }
 }

@@ -1,0 +1,71 @@
+<div class="relative w-full">
+  @if (isOpen()) {
+    <div
+      class="fixed inset-0 z-40 bg-primary/25 backdrop-blur-[6px] transition-opacity duration-200 ease-out motion-reduce:transition-none"
+      (click)="close()"
+    ></div>
+  }
+
+  <div
+    class="relative z-50 flex items-center gap-2 h-11 px-4 rounded-full bg-primary/60 backdrop-blur-[20px] border border-transparent transition-colors duration-180 ease-out"
+    [class.bg-primary/80]="isOpen()"
+    [class.border-white/25]="isOpen()"
+  >
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="text-subtle shrink-0">
+      <circle cx="11" cy="11" r="7" />
+      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+    </svg>
+    <input
+      type="text"
+      role="combobox"
+      aria-controls="place-search-listbox"
+      [attr.aria-expanded]="isOpen()"
+      class="flex-1 bg-transparent outline-none text-[14px] text-secondary placeholder:text-muted"
+      placeholder="Buscar cidade, bairro ou estado"
+      [value]="query()"
+      (input)="onInput($any($event.target).value)"
+      (focus)="open()"
+      (keydown)="onKeydown($event)"
+    />
+  </div>
+
+  @if (isOpen()) {
+    <div class="absolute top-full mt-3 w-full z-50 rounded-[10px] border border-white/15 bg-primary backdrop-blur-xl shadow-[0_16px_48px_-12px_rgba(0,0,0,0.45)] overflow-hidden">
+      <div class="absolute inset-0 bg-black/25 pointer-events-none"></div>
+
+      <ul
+        id="place-search-listbox"
+        role="listbox"
+        class="relative max-h-72 overflow-y-auto p-1.5 pr-1 scrollbar-thin [scrollbar-color:rgba(255,255,255,0.2)_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/20 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-white/30"
+      >
+        @if (showLoading()) {
+          <li class="flex items-center justify-center gap-2 px-3 py-4 text-center text-[13px] text-muted">
+            <span class="h-3.5 w-3.5 rounded-full border-2 border-muted border-t-transparent animate-spin"></span>
+            Procurando cidade…
+          </li>
+        } @else {
+          @for (place of filteredPlaces(); track place.id; let i = $index; let last = $last) {
+            <li
+              role="option"
+              [attr.aria-selected]="i === activeIndex()"
+              class="flex items-center gap-2 pl-2.5 pr-3 py-3 border-l-2 border-transparent cursor-pointer transition-colors duration-150 ease-out hover:bg-white/12"
+              [class.border-b]="!last"
+              [class.border-white/5]="!last"
+              [class.bg-white/16]="i === activeIndex()"
+              [class.border-accent]="i === activeIndex()"
+              (click)="select(place)"
+            >
+              <img src="/assets/svg/location-crosshairs.svg" alt="" class="h-4 w-4 shrink-0" />
+              <div class="flex-1 min-w-0">
+                <p class="text-sm text-secondary truncate">{{ place.name }}</p>
+                <p class="text-xs text-muted truncate">{{ place.neighborhood ? place.neighborhood + ', ' : '' }}{{ place.city }}, {{ place.state }}</p>
+              </div>
+            </li>
+          } @empty {
+            <li class="px-3 py-4 text-center text-[13px] text-muted">Nenhum lugar encontrado</li>
+          }
+        }
+      </ul>
+    </div>
+  }
+</div>
