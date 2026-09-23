@@ -1,0 +1,16 @@
+<svg
+  [attr.width]="size()"
+  [attr.height]="size()"
+  viewBox="0 0 24 24"
+  [attr.fill]="filled() ? 'currentColor' : 'none'"
+  stroke="currentColor"
+  stroke-width="1.75"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  [class.text-sun]="filled()"
+  [class.text-subtle]="!filled() && !mutedWhenEmpty()"
+  [class.text-muted]="!filled() && mutedWhenEmpty()"
+  class="transition-colors duration-180 ease-out group-hover:text-sun"
+>
+  <path d="M12 3.5l2.6 5.6 6.15.66-4.6 4.2 1.28 6.04L12 16.9l-5.43 3.1 1.28-6.04-4.6-4.2 6.15-.66L12 3.5z" />
+</svg>

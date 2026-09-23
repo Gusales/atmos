@@ -1,0 +1,86 @@
+@if (open()) {
+  <div
+    class="fixed inset-0 z-40 bg-primary/25 backdrop-blur-[6px] transition-opacity duration-200 ease-out motion-reduce:transition-none"
+    (click)="onBackdropClick()"
+  ></div>
+
+  <div class="fixed inset-0 z-50 grid place-items-center p-4 pointer-events-none">
+    <div
+      #panel
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="favorites-modal-title"
+      tabindex="-1"
+      class="pointer-events-auto w-full max-w-[420px] rounded-[10px] border border-white/15 bg-primary backdrop-blur-xl shadow-[0_16px_48px_-12px_rgba(0,0,0,0.45)] overflow-hidden focus:outline-none"
+      (keydown)="onKeydown($event)"
+    >
+      <div class="absolute inset-0 bg-black/25 pointer-events-none"></div>
+
+      <div class="relative flex items-center justify-between px-4 pt-3 pb-2">
+        <div class="flex items-center gap-2">
+          <app-star-icon [filled]="true" [size]="16" />
+          <h2 id="favorites-modal-title" class="text-[16px] text-subtle">Favoritos</h2>
+        </div>
+        <button
+          type="button"
+          class="h-8 w-8 grid place-content-center text-muted hover:text-secondary transition-colors duration-180 ease-out focus-visible:outline focus-visible:outline-white/40 focus-visible:outline-offset-2 rounded-full"
+          aria-label="Fechar"
+          (click)="closed.emit()"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <line x1="4" y1="4" x2="20" y2="20" />
+            <line x1="20" y1="4" x2="4" y2="20" />
+          </svg>
+        </button>
+      </div>
+
+      <ul
+        role="listbox"
+        class="relative max-h-72 overflow-y-auto p-1.5 pr-1 scrollbar-thin [scrollbar-color:rgba(255,255,255,0.2)_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/20 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-white/30"
+      >
+        @for (place of favorites(); track place.id; let last = $last) {
+          <li
+            role="option"
+            [attr.aria-selected]="place.id === currentPlaceId()"
+            class="group flex items-center gap-2 pl-2.5 pr-3 py-3 border-l-2 border-transparent cursor-pointer transition-colors duration-150 ease-out hover:bg-white/12"
+            [class.border-b]="!last"
+            [class.border-white/5]="!last"
+            [class.bg-white/16]="place.id === currentPlaceId()"
+            [class.border-accent]="place.id === currentPlaceId()"
+            (click)="place.id !== currentPlaceId() && onSelect(place)"
+          >
+            <app-weather-icon [name]="place.weatherIcon" class="h-8 w-8 shrink-0" />
+            <div class="flex-1 min-w-0">
+              <p class="text-sm text-secondary truncate">{{ place.name }}</p>
+              <p class="text-xs text-muted truncate">{{ place.state }}</p>
+            </div>
+            <div class="text-right shrink-0">
+              <p class="text-[16px] font-bold text-secondary">{{ place.currentTemperature }}°</p>
+              <p class="text-[12px] text-muted">
+                <span class="text-secondary">{{ place.maxTemperature }}°</span>
+                {{ place.minTemperature }}°
+              </p>
+            </div>
+            <button
+              type="button"
+              class="h-8 w-8 shrink-0 grid place-content-center opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-transform duration-180 ease-out active:scale-90 focus-visible:outline focus-visible:outline-white/40 focus-visible:outline-offset-2 rounded-full text-muted hover:text-danger"
+              aria-label="Remover dos favoritos"
+              (click)="onRemove($event, place.id)"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <line x1="4" y1="4" x2="20" y2="20" />
+                <line x1="20" y1="4" x2="4" y2="20" />
+              </svg>
+            </button>
+          </li>
+        } @empty {
+          <li class="grid justify-items-center gap-2 px-3 py-6 text-center">
+            <app-star-icon [filled]="false" [size]="24" class="opacity-40" />
+            <p class="text-[13px] text-muted">Nenhum lugar favoritado ainda</p>
+            <p class="text-[12px] text-muted">Busque um lugar e toque na estrela para salvar</p>
+          </li>
+        }
+      </ul>
+    </div>
+  </div>
+}

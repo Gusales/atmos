@@ -3,13 +3,32 @@
     id="app"
     class="min-h-screen w-full text-white font-['Lato',sans-serif] bg-[url('/assets/images/bg.jpg')] bg-cover bg-center bg-no-repeat grid gap-4 p-4 sm:p-8 min-[1200px]:gap-6 min-[1200px]:p-16 min-[1200px]:place-content-center min-[1200px]:grid-cols-[480px_277px_277px] min-[1200px]:grid-rows-[max-content_244px_212px]"
   >
-    <app-place-search
-      class="mb-10 min-[1200px]:col-[1/4] relative"
-      [places]="places()"
-      [loading]="isSearching()"
-      (search)="onSearch($event)"
-      (placeSelected)="onPlaceSelected($event)"
-    ></app-place-search>
+    <div class="flex items-center gap-2 mb-10 min-[1200px]:contents">
+      <app-place-search
+        class="flex-1 mb-10 min-[1200px]:col-[1/3] relative"
+        [places]="places()"
+        [loading]="isSearching()"
+        (search)="onSearch($event)"
+        (placeSelected)="onPlaceSelected($event)"
+      ></app-place-search>
+
+      <button
+        type="button"
+        class="h-10 min-w-10 px-2 flex items-center justify-center gap-1.5 shrink-0 min-[1200px]:col-[3/4] min-[1200px]:justify-self-end cursor-pointer text-subtle hover:text-sun transition-colors duration-180 ease-out focus-visible:outline focus-visible:outline-white/40 focus-visible:outline-offset-2 rounded-full"
+        aria-haspopup="dialog"
+        aria-label="Abrir favoritos"
+        (click)="openFavoritesModal()"
+      >
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round">
+          <line x1="4" y1="6" x2="20" y2="6" />
+          <line x1="4" y1="12" x2="20" y2="12" />
+          <line x1="4" y1="18" x2="20" y2="18" />
+        </svg>
+        @if (favoritesService.favorites().length > 0) {
+          <span class="text-[12px] text-muted">{{ favoritesService.favorites().length }}</span>
+        }
+      </button>
+    </div>
 
     <app-current-weather
       class="min-[1200px]:row-[2/4]"
@@ -21,6 +40,8 @@
       [humidity]="data.currentConditions.humidity"
       [rainProbabilityPercent]="data.currentConditions.precipprob"
       [location]="data.resolvedAddress"
+      [isFavorite]="isCurrentFavorite()"
+      (favoriteToggled)="toggleCurrentFavorite()"
     ></app-current-weather>
 
     <app-air-quality
@@ -38,4 +59,13 @@
 
     <app-weakly-forecast class="min-[1200px]:col-[2/4]" [weatherDays]="weekForecast()"></app-weakly-forecast>
   </main>
+
+  <app-favorites-modal
+    [favorites]="favoritesService.favorites()"
+    [currentPlaceId]="currentPlace()?.id ?? null"
+    [open]="isFavoritesModalOpen()"
+    (closed)="closeFavoritesModal()"
+    (placeSelected)="onFavoriteSelected($event)"
+    (placeRemoved)="onFavoriteRemoved($event)"
+  ></app-favorites-modal>
 }

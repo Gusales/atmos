@@ -2,12 +2,14 @@ import { Component, computed, inject, OnInit, signal } from "@angular/core";
 
 import { GeocodingLocationDto } from "@/app/core/dtos/geocoding";
 import { CurrentConditionsDto, WeatherResponseDto } from "@/app/core/dtos/weather";
+import { FavoritePlace, FavoritesService } from "@/app/core/services/favorites";
 import { GeoCodingService } from "@/app/core/services/geocoding";
 import { GeoLocationService, IUserLocation } from "@/app/core/services/geolocation";
 import { WeatherService } from "@/app/core/services/weather";
 import { firstValueFrom } from "rxjs";
 import { AirQualityComponent } from "../../components/air-quality";
 import { CurrentWeatherComponent } from "../../components/current-weather";
+import { FavoritesModalComponent } from "../../components/favorites-modal";
 import { PlaceSearchComponent } from "../../components/place-search";
 import { SkyCycleComponent } from "../../components/sky-cicle";
 import { WeaklyForecastComponent } from "../../components/weakly-forecast";
@@ -26,6 +28,14 @@ interface IWeekForecastDay {
 interface ISkyCycleTimes {
     startTime: string
     endTime: string
+}
+
+interface ICurrentPlace {
+    id: string
+    name: string
+    state: string
+    latitude: number
+    longitude: number
 }
 
 function parseTimeToMinutes(time: string): number {
@@ -71,6 +81,16 @@ function toPlace(location: GeocodingLocationDto): Place {
     }
 }
 
+function toCurrentPlace(location: GeocodingLocationDto): ICurrentPlace {
+    return {
+        id: String(location.place_id),
+        name: location.name,
+        state: location.address.state ?? '',
+        latitude: Number(location.lat),
+        longitude: Number(location.lon)
+    }
+}
+
 /**
  * Formata o local exibido de acordo com o nível geográfico retornado pela
  * API de geocoding: bairro mostra cidade e UF, cidade mostra só a UF, e
@@ -100,13 +120,15 @@ function formatLocationAddress(location: GeocodingLocationDto): string {
         AirQualityComponent,
         SkyCycleComponent,
         WeaklyForecastComponent,
-        PlaceSearchComponent
+        PlaceSearchComponent,
+        FavoritesModalComponent
     ]
 })
 export class WeatherDashboardComponent implements OnInit {
     protected readonly weatherService = inject(WeatherService)
     protected readonly geoLocationService = inject(GeoLocationService)
     protected readonly geocodingService = inject(GeoCodingService)
+    protected readonly favoritesService = inject(FavoritesService)
     protected readonly weather = signal<WeatherResponseDto | null>(null)
     private readonly defaultLocations: IUserLocation = {
         latitude: -23.5505,
@@ -164,10 +186,18 @@ export class WeatherDashboardComponent implements OnInit {
 
             data = weatherResponse
             data.resolvedAddress = formatLocationAddress(geocodingResponse)
+            this.currentPlace.set(toCurrentPlace(geocodingResponse))
 
         } catch (error) {
             data = await firstValueFrom(this.weatherService.getWeatherByLocation(this.defaultLocations.latitude, this.defaultLocations.longitude))
             data.resolvedAddress = "São Paulo, SP"
+            this.currentPlace.set({
+                id: "current",
+                name: "São Paulo",
+                state: "SP",
+                latitude: this.defaultLocations.latitude,
+                longitude: this.defaultLocations.longitude
+            })
         }
 
         this.weather.set(data)
@@ -205,6 +235,62 @@ export class WeatherDashboardComponent implements OnInit {
         )
 
         data.resolvedAddress = formatLocationAddress(location)
+        this.currentPlace.set(toCurrentPlace(location))
         this.weather.set(data)
+    }
+
+    protected currentPlace = signal<ICurrentPlace | null>(null)
+    protected isFavoritesModalOpen = signal(false)
+
+    protected readonly isCurrentFavorite = computed(() => {
+        const current = this.currentPlace()
+        return !!current && this.favoritesService.isFavorite(current.id)
+    })
+
+    protected openFavoritesModal(): void {
+        this.isFavoritesModalOpen.set(true)
+    }
+
+    protected closeFavoritesModal(): void {
+        this.isFavoritesModalOpen.set(false)
+    }
+
+    protected toggleCurrentFavorite(): void {
+        const current = this.currentPlace()
+        const data = this.weather()
+        const today = this.today()
+        if (!current || !data || !today) return
+
+        this.favoritesService.toggle({
+            id: current.id,
+            name: current.name,
+            state: current.state,
+            latitude: current.latitude,
+            longitude: current.longitude,
+            weatherIcon: this.resolveCurrentWeatherCondition(data.currentConditions),
+            currentTemperature: Math.round(data.currentConditions.temp),
+            maxTemperature: Math.round(today.tempmax),
+            minTemperature: Math.round(today.tempmin)
+        })
+    }
+
+    protected async onFavoriteSelected(place: FavoritePlace): Promise<void> {
+        const data = await firstValueFrom(
+            this.weatherService.getWeatherByLocation(place.latitude, place.longitude)
+        )
+
+        data.resolvedAddress = `${place.name}, ${place.state}`
+        this.currentPlace.set({
+            id: place.id,
+            name: place.name,
+            state: place.state,
+            latitude: place.latitude,
+            longitude: place.longitude
+        })
+        this.weather.set(data)
+    }
+
+    protected onFavoriteRemoved(id: string): void {
+        this.favoritesService.remove(id)
     }
 }
