@@ -1,0 +1,7 @@
+{
+    "extends": "../tsconfig.json",
+    "compilerOptions": {
+        "types": ["cypress", "node"]
+    },
+    "include": ["**/*.ts", "../test/e2e/dashboard.cy.ts", "../test/e2e/favorites.cy.ts", "../test/e2e/search.cy.ts"]
+}

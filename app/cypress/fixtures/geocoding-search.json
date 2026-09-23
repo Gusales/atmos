@@ -1,0 +1,52 @@
+{
+    "data": [
+        {
+            "place_id": 111111,
+            "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+            "osm_type": "relation",
+            "osm_id": 111111,
+            "lat": "-23.5112184",
+            "lon": "-46.8764612",
+            "class": "boundary",
+            "type": "administrative",
+            "place_rank": 16,
+            "importance": 0.6,
+            "addresstype": "city",
+            "name": "Barueri",
+            "display_name": "Barueri, São Paulo, Região Sudeste, Brasil",
+            "address": {
+                "city": "Barueri",
+                "state": "São Paulo",
+                "ISO3166-2-lvl4": "BR-SP",
+                "region": "Região Sudeste",
+                "country": "Brasil",
+                "country_code": "br"
+            },
+            "boundingbox": ["-23.5536510", "-23.4703789", "-46.9663017", "-46.7986840"]
+        },
+        {
+            "place_id": 222222,
+            "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+            "osm_type": "relation",
+            "osm_id": 222222,
+            "lat": "-23.5329",
+            "lon": "-46.7916",
+            "class": "boundary",
+            "type": "administrative",
+            "place_rank": 16,
+            "importance": 0.55,
+            "addresstype": "city",
+            "name": "Osasco",
+            "display_name": "Osasco, São Paulo, Região Sudeste, Brasil",
+            "address": {
+                "city": "Osasco",
+                "state": "São Paulo",
+                "ISO3166-2-lvl4": "BR-SP",
+                "region": "Região Sudeste",
+                "country": "Brasil",
+                "country_code": "br"
+            },
+            "boundingbox": ["-23.5600", "-23.5000", "-46.8200", "-46.7500"]
+        }
+    ]
+}
