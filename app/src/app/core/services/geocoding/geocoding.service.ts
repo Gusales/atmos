@@ -12,7 +12,6 @@ interface GeoCodingApiResponse<T> {
     data: T
 }
 
-/** A API devolve tipos como "county", "suburb", "road" etc. — só nos interessam esses. */
 const ALLOWED_ADDRESS_TYPES: readonly AddressType[] = ['city_district', 'city', 'state', 'suburb', 'town']
 
 function isAllowedAddressType(addresstype: string): addresstype is AddressType {
@@ -41,7 +40,6 @@ export class GeoCodingService extends BaseService {
     }
 
     public getPlaceByCoordinates(latitude: number, longitude: number): Observable<GeocodingLocationDto> {
-        console.log('bateuu')
         return this.GET<GeoCodingApiResponse<unknown>>(this.coordinatesPath, {
             params: { latitude, longitude }
         }).pipe(
