@@ -1,10 +1,16 @@
 # Utilização da IA no Desenvolvimento do Desafio
 
-Utilizei o Claude Code como par de desenvolvimento ao longo de praticamente todo o projeto, sempre em modo colaborativo: eu revisava e aprovava cada etapa antes de seguir pra próxima, e pedia mensagem de commit e confirmação a cada bloco de trabalho concluído. Abaixo, o resumo de como cada etapa foi conduzida com esse apoio.
+Utilizei o Claude Code como par de desenvolvimento ao longo de praticamente todo o projeto, sempre em modo colaborativo: eu revisava e aprovava cada etapa antes de seguir pra próxima, e pedia mensagem de commit e confirmação a cada bloco de trabalho concluído. Também usei o Claude.ai (web) separadamente, como apoio de pesquisa em documentação técnica do Angular e das APIs consumidas (Visual Crossing, Nominatim), fora do fluxo do Claude Code. Abaixo, o resumo de como cada etapa foi conduzida com esse apoio.
+
+## Layout e Estilização Inicial
+
+- Já tinha um layout desse mesmo projeto pronto em HTML/CSS puro, de um desafio anterior meu ([`Gusales/boracodar`, projeto número 10](https://github.com/Gusales/boracodar)). Esse layout original foi desenvolvido para os desafios semanais do canal da Rocketseat, a partir de um design que tenho no Figma. Pedi pra IA portar esse layout base pra dentro da estrutura de componentes Angular, mantendo a mesma identidade visual.
+- Usei o Claude Code pra ajustar os estilos com Tailwind, adaptando o layout original (pensado pra desktop) para telas de celular e tablet — breakpoints, reflow dos cards, e o scroll horizontal do card de previsão.
+- Pedi validações das chamadas às APIs externas (formato de resposta esperado, campos obrigatórios) durante essa fase inicial, antes mesmo de existir a suíte de testes automatizados.
 
 ## Testes Unitários
 
-- Pedi para a IA analisar como um outro projeto meu (`case_mastermind`) estruturava os testes unitários, e a partir disso gerar um plano de ação (`TESTING-ACTIONS.md`) cobrindo toda a superfície do projeto: schemas Zod, DTOs (`class-transformer`), services HTTP, componentes apresentacionais e componentes com interação de DOM, e o lado servidor (Express).
+- Pedi para a IA analisar como um outro case, utilizado em outro teste ténico para vaga de Analista JR ([`Skinzin/case_mastermind`](https://github.com/Skinzin/case_mastermind)) ,estruturava os testes unitários, e a partir disso gerar um plano de ação (`TESTING-ACTIONS.md`) cobrindo toda a superfície do projeto: schemas Zod, DTOs (`class-transformer`), services HTTP, componentes apresentacionais e componentes com interação de DOM, e o lado servidor (Express).
 - Executei o plano em 11 etapas sequenciais, revisando e aprovando cada uma antes de avançar. Isso resultou em 199 testes cobrindo o projeto inteiro (Vitest via `@angular/build:unit-test`).
 - A IA encontrou e corrigiu bugs reais nesse processo, não só lacunas de teste: um `provideHttpClient()` ausente em `app.config.ts` que quebraria toda chamada HTTP em produção, um `console.log` de debug esquecido no `GeoCodingService`, e um `app.spec.ts` com asserção obsoleta (`Hello, app`) que nunca refletia o app real.
 - Também apontei quando um comportamento parecia errado (ex: "esse componente não deveria vir com essa classe") e a IA investigou a causa raiz antes de propor a correção, em vez de aplicar um ajuste superficial.
