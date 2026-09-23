@@ -8,14 +8,16 @@ import {
 } from '@angular/ssr/node';
 import express from 'express';
 import { join } from 'node:path';
-import { weatherRoutes } from './app/server/routes';
+import { geocodingRoutes, weatherRoutes } from './app/server/routes';
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
 const app = express();
 const angularApp = new AngularNodeAppEngine();
+const defaultRoutesPrefix = '/api'
 
-app.use('/api', weatherRoutes)
+app.use(defaultRoutesPrefix, geocodingRoutes)
+app.use(defaultRoutesPrefix, weatherRoutes)
 
 /**
  * Example Express Rest API endpoints can be defined here.

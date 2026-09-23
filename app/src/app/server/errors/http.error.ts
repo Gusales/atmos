@@ -10,6 +10,12 @@ export class HttpError extends Error {
     }
 }
 
+export class UpstreamGeoCodingApiError extends HttpError {
+    constructor(statusCode: number, details: string) {
+        super(statusCode, 'Unable to retrieve data from the Geocoding api', details)
+    }
+}
+
 export class UpstreamWeatherApiError extends HttpError {
     constructor(statusCode: number, details: string) {
         super(statusCode, 'Unable to retrieve data from the weather api', details)
