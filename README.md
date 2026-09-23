@@ -231,3 +231,7 @@ atmos/
 ## 🎓 Contexto
 
 Projeto desenvolvido como resposta ao [desafio técnico para Front-end Júnior](docs/DESAFIO.md), cujo objetivo é avaliar consumo de APIs REST, estruturação de componentes, tratamento de estados e boas práticas de desenvolvimento. Além dos requisitos funcionais obrigatórios, o projeto foi ampliado com qualidade do ar, ciclo dia/noite, favoritos, testes automatizados (unitários e E2E) e containerização com Docker.
+
+## 🎨 Crédito de Design
+
+O layout é baseado num design próprio (Figma), originalmente criado para os desafios semanais do canal da [Rocketseat](https://www.youtube.com/@Rocketseat), e implementado antes em HTML/CSS puro no projeto [`Gusales/boracodar`](https://github.com/Gusales/boracodar) (desafio 10). Aqui, o mesmo layout foi portado para a estrutura de componentes Angular e adaptado com Tailwind para telas de celular e tablet.
