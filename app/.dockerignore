@@ -1,0 +1,23 @@
+# Modules
+**/node_modules/
+**/.git
+
+# Testing
+**/*.spec.ts/
+**/*.cy.ts/
+**/coverage
+
+# IDE's
+**/.vscode
+**/.idea
+**/.editorconfig
+
+# Unecessary files
+**/README.md
+**/npm-debug.log
+
+# Other builds
+**/dist
+
+#! Important
+**/.env
