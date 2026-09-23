@@ -30,7 +30,7 @@ interface ISkyCycleTimes {
     endTime: string
 }
 
-interface ICurrentPlace {
+export interface ICurrentPlace {
     id: string
     name: string
     state: string
@@ -38,12 +38,12 @@ interface ICurrentPlace {
     longitude: number
 }
 
-function parseTimeToMinutes(time: string): number {
+export function parseTimeToMinutes(time: string): number {
     const [hours, minutes] = time.split(":").map(Number)
     return hours * 60 + minutes
 }
 
-interface IWeatherConditionReading {
+export interface IWeatherConditionReading {
     precipprob: number
     humidity: number
 }
@@ -54,7 +54,7 @@ interface IWeatherConditionReading {
  * ser aplicado tanto a um dia inteiro (DayDto) quanto à leitura atual
  * (CurrentConditionsDto), já que ambos têm esses dois campos.
  */
-function resolveWeatherCondition(reading: IWeatherConditionReading): WeatherNamesEnum {
+export function resolveWeatherCondition(reading: IWeatherConditionReading): WeatherNamesEnum {
     if (reading.precipprob >= 70) return WeatherNamesEnum.THUNDER
     if (reading.precipprob >= 40) return WeatherNamesEnum.RAIN
     if (reading.precipprob >= 15) return WeatherNamesEnum.PARTLY_CLOUDY
@@ -63,7 +63,7 @@ function resolveWeatherCondition(reading: IWeatherConditionReading): WeatherName
     return WeatherNamesEnum.SUN
 }
 
-function weekdayName(dayOffset: number): string {
+export function weekdayName(dayOffset: number): string {
     const date = new Date()
     date.setDate(date.getDate() + dayOffset)
 
@@ -71,7 +71,7 @@ function weekdayName(dayOffset: number): string {
     return weekday.charAt(0).toUpperCase() + weekday.slice(1)
 }
 
-function toPlace(location: GeocodingLocationDto): Place {
+export function toPlace(location: GeocodingLocationDto): Place {
     return {
         id: String(location.place_id),
         name: location.name,
@@ -81,7 +81,7 @@ function toPlace(location: GeocodingLocationDto): Place {
     }
 }
 
-function toCurrentPlace(location: GeocodingLocationDto): ICurrentPlace {
+export function toCurrentPlace(location: GeocodingLocationDto): ICurrentPlace {
     return {
         id: String(location.place_id),
         name: location.name,
@@ -96,7 +96,7 @@ function toCurrentPlace(location: GeocodingLocationDto): ICurrentPlace {
  * API de geocoding: bairro mostra cidade e UF, cidade mostra só a UF, e
  * estado mostra "BR" no lugar da UF (não há uma UF "dele mesmo").
  */
-function formatLocationAddress(location: GeocodingLocationDto): string {
+export function formatLocationAddress(location: GeocodingLocationDto): string {
     const uf = location.address['ISO3166-2-lvl4']?.split('-')[1] ?? ''
 
     switch (location.addresstype) {
