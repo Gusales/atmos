@@ -29,6 +29,7 @@ describe('WeatherResponseDto (plainToInstance)', () => {
         expect(result.timezone).toBe('America/Sao_Paulo');
         expect(result.currentConditions.temp).toBe(18.9);
         expect(result.days[0].sunrise).toBe('05:58:10');
+        expect(result.days[0].hours[0].datetime).toBe('08:00:00');
     });
 
     it('strips fields that are not decorated with @Expose', () => {

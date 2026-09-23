@@ -12,6 +12,7 @@ describe('weatherSchema', () => {
         expect(result.latitude).toBe(-23.5505);
         expect(result.days).toHaveLength(1);
         expect(result.days[0].hours).toHaveLength(1);
+        expect(result.days[0].hours[0].datetime).toBe('08:00:00');
         expect(result.alerts).toHaveLength(1);
         expect(result.currentConditions.temp).toBe(18.9);
     });
@@ -56,6 +57,15 @@ describe('weatherSchema', () => {
         const raw = new WeatherResponseSchemaMock().entity();
         const days = (raw as Record<string, unknown>)['days'] as Record<string, unknown>[];
         delete days[0]['hours'];
+
+        expect(() => weatherSchema.parse(raw)).toThrow();
+    });
+
+    it('rejects an hour missing its datetime', () => {
+        const raw = new WeatherResponseSchemaMock().entity();
+        const days = (raw as Record<string, unknown>)['days'] as Record<string, unknown>[];
+        const hours = days[0]['hours'] as Record<string, unknown>[];
+        delete hours[0]['datetime'];
 
         expect(() => weatherSchema.parse(raw)).toThrow();
     });

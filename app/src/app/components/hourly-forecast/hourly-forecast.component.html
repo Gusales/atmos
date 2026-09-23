@@ -1,0 +1,27 @@
+<section class="min-w-0 w-full rounded-[10px] backdrop-blur-[10px] bg-primary p-4 min-[1200px]:p-10">
+  <div class="flex items-center gap-2 mb-4 min-[1200px]:mb-8">
+    <img src="/assets/svg/time.svg" alt="Ícone de relógio" />
+    <h2 class="text-[16px] text-subtle">Próximas horas</h2>
+  </div>
+
+  <ul
+    role="list"
+    class="min-w-0 flex overflow-x-auto gap-3 min-[1200px]:gap-6 pb-2 scrollbar-thin [scrollbar-color:rgba(255,255,255,0.2)_transparent] [&::-webkit-scrollbar]:h-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/20 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-white/30"
+  >
+    @for (hour of hours; track hour.time) {
+      <li
+        role="listitem"
+        class="shrink-0 flex flex-col items-center gap-2 min-[1200px]:gap-4 px-3 py-2 rounded-[10px]"
+        [class.bg-white/10]="hour.isNow"
+        [attr.aria-label]="ariaLabelFor(hour)"
+      >
+        <p class="text-[14px]">{{ hour.isNow ? 'Agora' : hour.time }}</p>
+        <app-weather-icon [name]="hour.weather" class="h-12 w-12 min-[1200px]:h-16 min-[1200px]:w-16" />
+        <p class="text-[14px]">{{ hour.temperature }}°</p>
+        <p class="text-[12px] text-muted">{{ weatherNameLabels[hour.weather] }}</p>
+      </li>
+    } @empty {
+      <li class="text-muted text-[13px]">Previsão horária indisponível</li>
+    }
+  </ul>
+</section>

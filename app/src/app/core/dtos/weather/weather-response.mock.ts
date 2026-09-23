@@ -27,6 +27,7 @@ export class WeatherResponseMock extends Mock<WeatherResponseDto> {
                     co: 193,
                     hours: [
                         new HourDto({
+                            datetime: '08:00:00',
                             temp: 18.9,
                             humidity: 88.56,
                             precipprob: 0,

@@ -9,6 +9,7 @@ const pollutantSchema = z.object({
 });
 
 const hourSchema = pollutantSchema.extend({
+    datetime: z.string(),
     temp: z.number(),
     humidity: z.number(),
     precipprob: z.number(),

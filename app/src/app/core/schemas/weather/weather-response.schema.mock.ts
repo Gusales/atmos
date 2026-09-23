@@ -32,6 +32,7 @@ export class WeatherResponseSchemaMock extends Mock<Record<string, unknown>> {
                     co: 193,
                     hours: [
                         {
+                            datetime: '08:00:00',
                             temp: 18.9,
                             humidity: 88.56,
                             precipprob: 0,

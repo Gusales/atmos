@@ -32,4 +32,19 @@ describe('WeaklyForecastComponent', () => {
         const icons = fixture.nativeElement.querySelectorAll('app-weather-icon');
         expect(icons.length).toBe(2);
     });
+
+    it('renders each day\'s own min/max temperature instead of a fixed value', () => {
+        const fixture = TestBed.createComponent(WeaklyForecastComponent);
+        fixture.componentRef.setInput('weatherDays', [
+            { name: 'Amanhã', weather: WeatherNamesEnum.SUN, minTemperature: 16, maxTemperature: 21 },
+            { name: 'Terça', weather: WeatherNamesEnum.CLOUDY, minTemperature: 5, maxTemperature: 9 }
+        ]);
+        fixture.detectChanges();
+
+        const days: HTMLElement[] = Array.from(fixture.nativeElement.querySelectorAll('div.flex.flex-col'));
+        expect(days[0].textContent).toContain('21°');
+        expect(days[0].textContent).toContain('16°');
+        expect(days[1].textContent).toContain('9°');
+        expect(days[1].textContent).toContain('5°');
+    });
 });

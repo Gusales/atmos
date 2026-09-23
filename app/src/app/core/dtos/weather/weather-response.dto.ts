@@ -1,6 +1,7 @@
 import { Expose, Type } from "class-transformer";
 
 export class HourDto {
+    @Expose() datetime: string = ''
     @Expose() temp: number = 0
     @Expose() humidity: number = 0
     @Expose() precipprob: number = 0

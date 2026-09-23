@@ -1,5 +1,5 @@
 import { GeocodingLocationMock } from '@/app/core/dtos/geocoding';
-import { WeatherResponseMock } from '@/app/core/dtos/weather';
+import { DayDto, HourDto, WeatherResponseMock } from '@/app/core/dtos/weather';
 import { FavoritesService } from '@/app/core/services/favorites';
 import { GeoCodingService } from '@/app/core/services/geocoding';
 import { GeoLocationService } from '@/app/core/services/geolocation';
@@ -7,7 +7,19 @@ import { WeatherService } from '@/app/core/services/weather';
 import { TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { WeatherNamesEnum } from '../../shared/enums';
 import { WeatherDashboardComponent } from './index';
+
+function buildDayWithHours(baseTemp: number, precipprobAt: Record<number, number> = {}): DayDto {
+    const hours = Array.from({ length: 24 }, (_, hour) => new HourDto({
+        datetime: `${String(hour).padStart(2, '0')}:00:00`,
+        temp: baseTemp + hour * 0.4,
+        humidity: 50,
+        precipprob: precipprobAt[hour] ?? 0
+    }));
+
+    return new DayDto({ tempmax: baseTemp + 5, tempmin: baseTemp - 5, hours });
+}
 
 describe('WeatherDashboardComponent (integration)', () => {
     let fixture: ReturnType<typeof TestBed.createComponent<WeatherDashboardComponent>>;
@@ -60,6 +72,7 @@ describe('WeatherDashboardComponent (integration)', () => {
         expect(compiled.querySelector('app-air-quality')).not.toBeNull();
         expect(compiled.querySelector('app-sky-cycle')).not.toBeNull();
         expect(compiled.querySelector('app-weakly-forecast')).not.toBeNull();
+        expect(compiled.querySelector('app-hourly-forecast')).not.toBeNull();
     });
 
     it('falls back to São Paulo when geolocation fails', async () => {
@@ -192,6 +205,44 @@ describe('WeatherDashboardComponent (integration)', () => {
 
             component['closeFavoritesModal']();
             expect(component['isFavoritesModalOpen']()).toBe(false);
+        });
+    });
+
+    describe('hourlyForecast', () => {
+        beforeEach(() => vi.useFakeTimers());
+        afterEach(() => vi.useRealTimers());
+
+        it('returns an empty array when there is no weather data yet', () => {
+            expect(component['hourlyForecast']()).toEqual([]);
+        });
+
+        it('slices from the current hour through the end of today and completes with tomorrow, capped at 12', () => {
+            vi.setSystemTime(new Date('2026-09-23T20:00:00'));
+
+            const today = buildDayWithHours(10, { 22: 70 });
+            const tomorrow = buildDayWithHours(5);
+            component['weather'].set(new WeatherResponseMock().entity({ days: [today, tomorrow] }));
+
+            const forecast = component['hourlyForecast']();
+
+            expect(forecast).toHaveLength(12);
+            expect(forecast[0]).toEqual({ time: '20:00', weather: WeatherNamesEnum.SUN, temperature: 18, isNow: true });
+            expect(forecast.slice(1).every(hour => hour.isNow === false)).toBe(true);
+
+            // 4 horas restantes de hoje (20,21,22,23) + 8 do dia seguinte (00..07)
+            expect(forecast[2].time).toBe('22:00');
+            expect(forecast[2].weather).toBe(WeatherNamesEnum.THUNDER);
+            expect(forecast[4].time).toBe('00:00');
+            expect(forecast[11].time).toBe('07:00');
+        });
+
+        it('rounds the temperature', () => {
+            vi.setSystemTime(new Date('2026-09-23T10:00:00'));
+
+            const today = buildDayWithHours(10);
+            component['weather'].set(new WeatherResponseMock().entity({ days: [today] }));
+
+            expect(component['hourlyForecast']()[0].temperature).toBe(Math.round(10 + 10 * 0.4));
         });
     });
 

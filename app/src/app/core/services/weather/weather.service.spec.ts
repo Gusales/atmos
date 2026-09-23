@@ -44,6 +44,20 @@ describe('WeatherService', () => {
             expect(result?.currentConditions.temp).toBe(18.9);
         });
 
+        it('validates and transforms a response whose day has no hours', () => {
+            let result: WeatherResponseDto | undefined;
+            service.getWeatherBySearch('-23.5505,-46.6333').subscribe(value => (result = value));
+
+            const raw = new WeatherResponseSchemaMock().entity() as { days: Array<Record<string, unknown>> };
+            raw.days[0]['hours'] = [];
+
+            const req = httpMock.expectOne(request => request.url === '/api/weather');
+            req.flush({ data: raw });
+
+            expect(result).toBeInstanceOf(WeatherResponseDto);
+            expect(result?.days[0].hours).toEqual([]);
+        });
+
         it('errors out when the response does not match weatherSchema', () => {
             let error: unknown;
             service.getWeatherBySearch('invalid').subscribe({ error: (err) => (error = err) });

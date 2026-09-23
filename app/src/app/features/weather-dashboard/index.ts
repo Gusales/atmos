@@ -11,6 +11,7 @@ import { firstValueFrom, interval } from "rxjs";
 import { AirQualityComponent } from "../../components/air-quality";
 import { CurrentWeatherComponent } from "../../components/current-weather";
 import { FavoritesModalComponent } from "../../components/favorites-modal";
+import { HourlyForecastComponent } from "../../components/hourly-forecast";
 import { PlaceSearchComponent } from "../../components/place-search";
 import { SkyCycleComponent } from "../../components/sky-cicle";
 import { WeaklyForecastComponent } from "../../components/weakly-forecast";
@@ -63,6 +64,18 @@ export function resolveWeatherCondition(reading: IWeatherConditionReading): Weat
     if (reading.humidity >= 80) return WeatherNamesEnum.CLOUDY
 
     return WeatherNamesEnum.SUN
+}
+
+export interface IHourForecast {
+    time: string
+    weather: WeatherNamesEnum
+    temperature: number
+    isNow: boolean
+}
+
+/** Normaliza o `datetime` cru da API (`"08:00:00"`) para exibição (`"08:00"`). */
+export function formatHour(datetime: string): string {
+    return datetime.slice(0, 5)
 }
 
 export function weekdayName(dayOffset: number): string {
@@ -123,7 +136,8 @@ export function formatLocationAddress(location: GeocodingLocationDto): string {
         SkyCycleComponent,
         WeaklyForecastComponent,
         PlaceSearchComponent,
-        FavoritesModalComponent
+        FavoritesModalComponent,
+        HourlyForecastComponent
     ]
 })
 export class WeatherDashboardComponent implements OnInit {
@@ -148,6 +162,32 @@ export class WeatherDashboardComponent implements OnInit {
             minTemperature: day.tempmin,
             maxTemperature: day.tempmax
         }))
+    })
+
+    /**
+     * Junta as horas restantes do dia atual (a partir da hora corrente,
+     * inclusive) com o início do dia seguinte quando faltar pra completar 12
+     * itens — evita que o card fique quase vazio à noite.
+     */
+    protected readonly hourlyForecast = computed<IHourForecast[]>(() => {
+        const days = this.weather()?.days ?? []
+        const today = days[0]
+        if (!today) return []
+
+        const currentHour = new Date().getHours()
+        const todayHours = today.hours.slice(currentHour)
+
+        const remaining = 12 - todayHours.length
+        const nextDayHours = remaining > 0 ? (days[1]?.hours ?? []).slice(0, remaining) : []
+
+        return [...todayHours, ...nextDayHours]
+            .slice(0, 12)
+            .map((hour, index) => ({
+                time: formatHour(hour.datetime),
+                weather: resolveWeatherCondition(hour),
+                temperature: Math.round(hour.temp),
+                isNow: index === 0
+            }))
     })
 
     /**

@@ -58,6 +58,8 @@
     ></app-sky-cycle>
 
     <app-weakly-forecast class="min-[1200px]:col-[2/4]" [weatherDays]="weekForecast()"></app-weakly-forecast>
+
+    <app-hourly-forecast class="min-w-0 min-[1200px]:col-[1/4]" [hours]="hourlyForecast()"></app-hourly-forecast>
   </main>
 
   <app-favorites-modal
